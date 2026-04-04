@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
 import axios from 'axios';
 
 function App() {
@@ -10,7 +9,7 @@ function App() {
     // Check backend health
     axios
       .get('/api/health')
-      .then((res) => {
+      .then((_res) => {
         setBackendStatus('✓ Backend connected');
       })
       .catch(() => {

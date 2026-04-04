@@ -1,4 +1,4 @@
-import { initializeDatabase, getPool } from './connection.js';
+import { initializeDatabase } from './connection.js';
 import { runMigration } from './schema.js';
 
 async function migrate() {

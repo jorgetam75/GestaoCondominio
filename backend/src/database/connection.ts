@@ -21,7 +21,7 @@ export async function initializeDatabase() {
 
     // Test connection
     const client = await pool.connect();
-    const result = await client.query('SELECT NOW()');
+    await client.query('SELECT NOW()');
     client.release();
 
     console.log('Connected to PostgreSQL database');
