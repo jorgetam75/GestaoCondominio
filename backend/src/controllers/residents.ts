@@ -3,7 +3,7 @@ import * as residentsModel from '../models/residents.js';
 
 export async function createResident(req: Request, res: Response): Promise<void> {
   try {
-    if (!['admin', 'manager'].includes(req.user?.role || '')) {
+    if (!['ADMIN', 'MANAGER'].includes(req.user?.role || '')) {
       res.status(403).json({ error: 'Unauthorized' });
       return;
     }
@@ -79,7 +79,7 @@ export async function listResidentsByBuilding(req: Request, res: Response): Prom
 
 export async function updateResident(req: Request, res: Response): Promise<void> {
   try {
-    if (!['admin', 'manager'].includes(req.user?.role || '')) {
+    if (!['ADMIN', 'MANAGER'].includes(req.user?.role || '')) {
       res.status(403).json({ error: 'Unauthorized' });
       return;
     }
@@ -102,7 +102,7 @@ export async function updateResident(req: Request, res: Response): Promise<void>
 
 export async function deleteResident(req: Request, res: Response): Promise<void> {
   try {
-    if (!['admin', 'manager'].includes(req.user?.role || '')) {
+    if (!['ADMIN', 'MANAGER'].includes(req.user?.role || '')) {
       res.status(403).json({ error: 'Unauthorized' });
       return;
     }

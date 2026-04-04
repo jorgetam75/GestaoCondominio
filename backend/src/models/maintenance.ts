@@ -79,13 +79,15 @@ export async function listMaintenanceByBuilding(building_id: string, status?: st
   };
 }
 
+const ALLOWED_MAINTENANCE_FIELDS = ['description', 'status', 'priority', 'assigned_to'];
+
 export async function updateMaintenanceRequest(id: string, updates: any) {
   const fields = [];
   const values: any[] = [];
   let paramNum = 1;
 
   Object.entries(updates).forEach(([key, value]) => {
-    if (value !== undefined && !['id', 'unit_id', 'created_by'].includes(key)) {
+    if (value !== undefined && ALLOWED_MAINTENANCE_FIELDS.includes(key)) {
       if (key === 'status' && value === 'completed') {
         fields.push(`${key} = $${paramNum}`);
         fields.push(`resolved_at = NOW()`);

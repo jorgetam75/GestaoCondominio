@@ -58,13 +58,15 @@ export async function listResidentsByBuilding(building_id: string, limit = 50, o
   };
 }
 
+const ALLOWED_RESIDENT_FIELDS = ['name', 'email', 'phone', 'is_owner'];
+
 export async function updateResident(id: string, updates: any) {
   const fields = [];
   const values: any[] = [];
   let paramNum = 1;
 
   Object.entries(updates).forEach(([key, value]) => {
-    if (value !== undefined && key !== 'id' && key !== 'unit_id') {
+    if (value !== undefined && ALLOWED_RESIDENT_FIELDS.includes(key)) {
       fields.push(`${key} = $${paramNum}`);
       values.push(value);
       paramNum++;

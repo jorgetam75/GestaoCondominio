@@ -3,7 +3,7 @@ import * as accessCodesModel from '../models/access-codes.js';
 
 export async function createAccessCode(req: Request, res: Response): Promise<void> {
   try {
-    if (!['admin', 'manager'].includes(req.user?.role || '')) {
+    if (!['ADMIN', 'MANAGER'].includes(req.user?.role || '')) {
       res.status(403).json({ error: 'Unauthorized' });
       return;
     }
@@ -82,7 +82,7 @@ export async function listAccessCodesByUnit(req: Request, res: Response): Promis
 
 export async function listAccessCodesByBuilding(req: Request, res: Response): Promise<void> {
   try {
-    if (!['admin', 'manager'].includes(req.user?.role || '')) {
+    if (!['ADMIN', 'MANAGER'].includes(req.user?.role || '')) {
       res.status(403).json({ error: 'Unauthorized' });
       return;
     }
@@ -98,7 +98,7 @@ export async function listAccessCodesByBuilding(req: Request, res: Response): Pr
 
 export async function expireAccessCode(req: Request, res: Response): Promise<void> {
   try {
-    if (!['admin', 'manager'].includes(req.user?.role || '')) {
+    if (!['ADMIN', 'MANAGER'].includes(req.user?.role || '')) {
       res.status(403).json({ error: 'Unauthorized' });
       return;
     }
@@ -120,7 +120,7 @@ export async function expireAccessCode(req: Request, res: Response): Promise<voi
 
 export async function deleteAccessCode(req: Request, res: Response): Promise<void> {
   try {
-    if (req.user?.role !== 'admin') {
+    if (req.user?.role !== 'ADMIN') {
       res.status(403).json({ error: 'Unauthorized' });
       return;
     }

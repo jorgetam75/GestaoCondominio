@@ -3,7 +3,7 @@ import * as announcementsModel from '../models/announcements.js';
 
 export async function createAnnouncement(req: Request, res: Response): Promise<void> {
   try {
-    if (!['admin', 'manager'].includes(req.user?.role || '')) {
+    if (!['ADMIN', 'MANAGER'].includes(req.user?.role || '')) {
       res.status(403).json({ error: 'Unauthorized' });
       return;
     }
@@ -70,7 +70,7 @@ export async function listAnnouncementsByBuilding(req: Request, res: Response): 
 
 export async function updateAnnouncement(req: Request, res: Response): Promise<void> {
   try {
-    if (!['admin', 'manager'].includes(req.user?.role || '')) {
+    if (!['ADMIN', 'MANAGER'].includes(req.user?.role || '')) {
       res.status(403).json({ error: 'Unauthorized' });
       return;
     }
@@ -93,7 +93,7 @@ export async function updateAnnouncement(req: Request, res: Response): Promise<v
 
 export async function deleteAnnouncement(req: Request, res: Response): Promise<void> {
   try {
-    if (!['admin', 'manager'].includes(req.user?.role || '')) {
+    if (!['ADMIN', 'MANAGER'].includes(req.user?.role || '')) {
       res.status(403).json({ error: 'Unauthorized' });
       return;
     }

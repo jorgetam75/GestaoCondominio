@@ -44,13 +44,15 @@ export async function listAnnouncementsByBuilding(building_id: string, limit = 5
   };
 }
 
+const ALLOWED_ANNOUNCEMENT_FIELDS = ['title', 'content'];
+
 export async function updateAnnouncement(id: string, updates: any) {
   const fields = [];
   const values: any[] = [];
   let paramNum = 1;
 
   Object.entries(updates).forEach(([key, value]) => {
-    if (value !== undefined && !['id', 'building_id', 'created_by'].includes(key)) {
+    if (value !== undefined && ALLOWED_ANNOUNCEMENT_FIELDS.includes(key)) {
       fields.push(`${key} = $${paramNum}`);
       values.push(value);
       paramNum++;

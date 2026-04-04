@@ -67,13 +67,15 @@ export async function listFinancialByBuilding(building_id: string, limit = 100, 
   };
 }
 
+const ALLOWED_FINANCIAL_FIELDS = ['description', 'amount', 'type', 'due_date', 'paid_date', 'paid_at'];
+
 export async function updateFinancialRecord(id: string, updates: any) {
   const fields = [];
   const values: any[] = [];
   let paramNum = 1;
 
   Object.entries(updates).forEach(([key, value]) => {
-    if (value !== undefined && !['id', 'unit_id', 'created_by'].includes(key)) {
+    if (value !== undefined && ALLOWED_FINANCIAL_FIELDS.includes(key)) {
       fields.push(`${key} = $${paramNum}`);
       values.push(value);
       paramNum++;

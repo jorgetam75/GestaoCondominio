@@ -30,7 +30,16 @@ export const config = {
 };
 
 export function validateConfig() {
-  if (!config.JWT_SECRET || config.JWT_SECRET.includes('change-in-production')) {
-    console.warn('⚠️  JWT_SECRET is not set or using default value. Set JWT_SECRET in .env for production.');
+  if (config.NODE_ENV === 'production') {
+    if (!process.env.JWT_SECRET || config.JWT_SECRET.includes('change-in-production')) {
+      throw new Error('FATAL: JWT_SECRET must be set in production. Server will not start with default secret.');
+    }
+    if (!process.env.ADMIN_PASSWORD || config.ADMIN_PASSWORD === 'admin123') {
+      console.warn('⚠️  ADMIN_PASSWORD is using default value. Change it immediately.');
+    }
+  } else {
+    if (!config.JWT_SECRET || config.JWT_SECRET.includes('change-in-production')) {
+      console.warn('⚠️  JWT_SECRET is not set or using default value. Set JWT_SECRET in .env for production.');
+    }
   }
 }

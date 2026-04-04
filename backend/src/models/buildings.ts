@@ -36,13 +36,15 @@ export async function listBuildings(limit = 50, offset = 0) {
   };
 }
 
+const ALLOWED_BUILDING_FIELDS = ['name', 'address', 'city', 'state', 'zip_code'];
+
 export async function updateBuilding(id: string, updates: any) {
   const fields = [];
   const values: any[] = [];
   let paramNum = 1;
 
   Object.entries(updates).forEach(([key, value]) => {
-    if (value !== undefined) {
+    if (value !== undefined && ALLOWED_BUILDING_FIELDS.includes(key)) {
       fields.push(`${key} = $${paramNum}`);
       values.push(value);
       paramNum++;

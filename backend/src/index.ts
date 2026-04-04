@@ -2,7 +2,7 @@ import express, { Express, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import 'express-async-errors';
-import { config } from './config/index.js';
+import { config, validateConfig } from './config/index.js';
 import { initializeDatabase } from './database/connection.js';
 import authRoutes from './routes/auth.js';
 import buildingsRoutes from './routes/buildings.js';
@@ -18,9 +18,12 @@ const app: Express = express();
 
 // Middleware
 app.use(helmet());
-app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(cors({
+  origin: config.CORS_ORIGIN,
+  credentials: true,
+}));
+app.use(express.json({ limit: '10kb' }));
+app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 
 // Health check
 app.get('/health', (_req: Request, res: Response) => {
@@ -54,6 +57,9 @@ app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
 // Start server
 async function start() {
   try {
+    // Validate configuration before starting
+    validateConfig();
+
     // Initialize database connection
     await initializeDatabase();
     console.log('✓ Database connected');

@@ -3,7 +3,7 @@ import * as unitsModel from '../models/units.js';
 
 export async function createUnit(req: Request, res: Response): Promise<void> {
   try {
-    if (req.user?.role !== 'admin') {
+    if (req.user?.role !== 'ADMIN') {
       res.status(403).json({ error: 'Unauthorized' });
       return;
     }
@@ -61,7 +61,7 @@ export async function listUnitsByBuilding(req: Request, res: Response): Promise<
 
 export async function updateUnit(req: Request, res: Response): Promise<void> {
   try {
-    if (!['admin', 'manager'].includes(req.user?.role || '')) {
+    if (!['ADMIN', 'MANAGER'].includes(req.user?.role || '')) {
       res.status(403).json({ error: 'Unauthorized' });
       return;
     }
@@ -84,7 +84,7 @@ export async function updateUnit(req: Request, res: Response): Promise<void> {
 
 export async function deleteUnit(req: Request, res: Response): Promise<void> {
   try {
-    if (req.user?.role !== 'admin') {
+    if (req.user?.role !== 'ADMIN') {
       res.status(403).json({ error: 'Unauthorized' });
       return;
     }

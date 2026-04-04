@@ -3,7 +3,7 @@ import * as buildingsModel from '../models/buildings.js';
 
 export async function createBuilding(req: Request, res: Response): Promise<void> {
   try {
-    if (req.user?.role !== 'admin') {
+    if (req.user?.role !== 'ADMIN') {
       res.status(403).json({ error: 'Unauthorized' });
       return;
     }
@@ -60,7 +60,7 @@ export async function listBuildings(req: Request, res: Response): Promise<void> 
 
 export async function updateBuilding(req: Request, res: Response): Promise<void> {
   try {
-    if (req.user?.role !== 'admin') {
+    if (req.user?.role !== 'ADMIN') {
       res.status(403).json({ error: 'Unauthorized' });
       return;
     }
@@ -83,7 +83,7 @@ export async function updateBuilding(req: Request, res: Response): Promise<void>
 
 export async function deleteBuilding(req: Request, res: Response): Promise<void> {
   try {
-    if (req.user?.role !== 'admin') {
+    if (req.user?.role !== 'ADMIN') {
       res.status(403).json({ error: 'Unauthorized' });
       return;
     }

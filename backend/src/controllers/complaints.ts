@@ -60,7 +60,7 @@ export async function listComplaintsByUnit(req: Request, res: Response): Promise
 
 export async function listComplaintsByBuilding(req: Request, res: Response): Promise<void> {
   try {
-    if (!['admin', 'manager'].includes(req.user?.role || '')) {
+    if (!['ADMIN', 'MANAGER'].includes(req.user?.role || '')) {
       res.status(403).json({ error: 'Unauthorized' });
       return;
     }
@@ -92,7 +92,7 @@ export async function listComplaintsByBuilding(req: Request, res: Response): Pro
 
 export async function updateComplaint(req: Request, res: Response): Promise<void> {
   try {
-    if (!['admin', 'manager'].includes(req.user?.role || '')) {
+    if (!['ADMIN', 'MANAGER'].includes(req.user?.role || '')) {
       res.status(403).json({ error: 'Unauthorized' });
       return;
     }
@@ -115,7 +115,7 @@ export async function updateComplaint(req: Request, res: Response): Promise<void
 
 export async function deleteComplaint(req: Request, res: Response): Promise<void> {
   try {
-    if (req.user?.role !== 'admin') {
+    if (req.user?.role !== 'ADMIN') {
       res.status(403).json({ error: 'Unauthorized' });
       return;
     }

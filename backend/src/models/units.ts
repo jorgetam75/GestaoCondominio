@@ -38,13 +38,15 @@ export async function listUnitsByBuilding(building_id: string, limit = 50, offse
   };
 }
 
+const ALLOWED_UNIT_FIELDS = ['unit_number', 'floor', 'type'];
+
 export async function updateUnit(id: string, updates: any) {
   const fields = [];
   const values: any[] = [];
   let paramNum = 1;
 
   Object.entries(updates).forEach(([key, value]) => {
-    if (value !== undefined && key !== 'id' && key !== 'building_id') {
+    if (value !== undefined && ALLOWED_UNIT_FIELDS.includes(key)) {
       fields.push(`${key} = $${paramNum}`);
       values.push(value);
       paramNum++;

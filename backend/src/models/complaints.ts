@@ -78,13 +78,15 @@ export async function listComplaintsByBuilding(building_id: string, status?: str
   };
 }
 
+const ALLOWED_COMPLAINT_FIELDS = ['description', 'status', 'assigned_to'];
+
 export async function updateComplaint(id: string, updates: any) {
   const fields = [];
   const values: any[] = [];
   let paramNum = 1;
 
   Object.entries(updates).forEach(([key, value]) => {
-    if (value !== undefined && !['id', 'unit_id', 'created_by'].includes(key)) {
+    if (value !== undefined && ALLOWED_COMPLAINT_FIELDS.includes(key)) {
       if ((key === 'status' && value === 'resolved') || value === 'closed') {
         fields.push(`${key} = $${paramNum}`);
         fields.push(`resolved_at = NOW()`);

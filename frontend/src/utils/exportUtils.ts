@@ -92,14 +92,15 @@ export function printElement(elementId: string, title?: string) {
       </style>
     `;
 
+    const sanitizedTitle = (title || 'Print Document').replace(/[<>"'&]/g, '');
     printWindow.document.write(`
       <html>
         <head>
-          <title>${title || 'Print Document'}</title>
+          <title>${sanitizedTitle}</title>
           ${styles}
         </head>
         <body>
-          ${title ? `<h1>${title}</h1>` : ''}
+          ${sanitizedTitle !== 'Print Document' ? `<h1>${sanitizedTitle}</h1>` : ''}
           ${element.innerHTML}
         </body>
       </html>

@@ -3,7 +3,7 @@ import * as financialModel from '../models/financial.js';
 
 export async function createFinancialRecord(req: Request, res: Response): Promise<void> {
   try {
-    if (!['admin', 'manager'].includes(req.user?.role || '')) {
+    if (!['ADMIN', 'MANAGER'].includes(req.user?.role || '')) {
       res.status(403).json({ error: 'Unauthorized' });
       return;
     }
@@ -90,7 +90,7 @@ export async function listFinancialByBuilding(req: Request, res: Response): Prom
 
 export async function updateFinancialRecord(req: Request, res: Response): Promise<void> {
   try {
-    if (!['admin', 'manager'].includes(req.user?.role || '')) {
+    if (!['ADMIN', 'MANAGER'].includes(req.user?.role || '')) {
       res.status(403).json({ error: 'Unauthorized' });
       return;
     }
@@ -113,7 +113,7 @@ export async function updateFinancialRecord(req: Request, res: Response): Promis
 
 export async function getBuildingFinancialReport(req: Request, res: Response): Promise<void> {
   try {
-    if (!['admin', 'manager'].includes(req.user?.role || '')) {
+    if (!['ADMIN', 'MANAGER'].includes(req.user?.role || '')) {
       res.status(403).json({ error: 'Unauthorized' });
       return;
     }
@@ -129,7 +129,7 @@ export async function getBuildingFinancialReport(req: Request, res: Response): P
 
 export async function deleteFinancialRecord(req: Request, res: Response): Promise<void> {
   try {
-    if (req.user?.role !== 'admin') {
+    if (req.user?.role !== 'ADMIN') {
       res.status(403).json({ error: 'Unauthorized' });
       return;
     }
