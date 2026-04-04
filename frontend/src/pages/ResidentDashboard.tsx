@@ -1,6 +1,11 @@
 import { useState } from 'react';
 import useAuthStore from '../hooks/useAuth';
 
+interface FormErrors {
+  description?: string;
+  priority?: string;
+}
+
 export function ResidentDashboard() {
   const { user, logout } = useAuthStore();
   const [activeTab, setActiveTab] = useState('overview');
@@ -8,19 +13,53 @@ export function ResidentDashboard() {
     description: '',
     priority: 'medium',
   });
+  const [formErrors, setFormErrors] = useState<FormErrors>({});
   const [submitting, setSubmitting] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+
+  const validateForm = () => {
+    const errors: FormErrors = {};
+
+    if (!maintenanceForm.description.trim()) {
+      errors.description = 'Description is required';
+    } else if (maintenanceForm.description.length < 10) {
+      errors.description = 'Description must be at least 10 characters';
+    } else if (maintenanceForm.description.length > 500) {
+      errors.description = 'Description must not exceed 500 characters';
+    }
+
+    if (!maintenanceForm.priority) {
+      errors.priority = 'Priority level is required';
+    }
+
+    return errors;
+  };
 
   const handleMaintenanceSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSuccessMessage('');
+    setErrorMessage('');
+
+    const errors = validateForm();
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
+      return;
+    }
+
     setSubmitting(true);
-    
+    setFormErrors({});
+
     try {
       // In a real app, this would call the API
       // await api.post('/maintenance', { ...maintenanceForm, unit_id: userUnitId });
-      alert('Maintenance request submitted! (Demo mode)');
+      await new Promise((resolve) => setTimeout(resolve, 500)); // Simulate API delay
+      setSuccessMessage('Maintenance request submitted successfully! (Demo mode)');
       setMaintenanceForm({ description: '', priority: 'medium' });
+      setTimeout(() => setSuccessMessage(''), 3000);
     } catch (error) {
-      alert('Failed to submit maintenance request');
+      setErrorMessage('Failed to submit maintenance request. Please try again.');
+      console.error('Form submission error:', error);
     } finally {
       setSubmitting(false);
     }
@@ -126,6 +165,18 @@ export function ResidentDashboard() {
         {/* Maintenance Tab */}
         {activeTab === 'maintenance' && (
           <div className="space-y-6">
+            {/* Success/Error Messages */}
+            {successMessage && (
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                <p className="text-green-800 font-medium">✓ {successMessage}</p>
+              </div>
+            )}
+            {errorMessage && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                <p className="text-red-800 font-medium">✗ {errorMessage}</p>
+              </div>
+            )}
+
             {/* Submit Form */}
             <div className="bg-white rounded-lg shadow p-6">
               <h2 className="text-lg font-bold text-gray-900 mb-4">Submit Maintenance Request</h2>
@@ -133,34 +184,59 @@ export function ResidentDashboard() {
                 <div>
                   <label className="block text-sm font-medium text-gray-900 mb-2">
                     Description
+                    <span className="text-red-600 ml-1">*</span>
                   </label>
                   <textarea
                     value={maintenanceForm.description}
-                    onChange={(e) =>
-                      setMaintenanceForm({ ...maintenanceForm, description: e.target.value })
-                    }
-                    placeholder="Describe the maintenance issue..."
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
+                    onChange={(e) => {
+                      setMaintenanceForm({ ...maintenanceForm, description: e.target.value });
+                      if (formErrors.description) {
+                        setFormErrors({ ...formErrors, description: undefined });
+                      }
+                    }}
+                    placeholder="Describe the maintenance issue (min 10, max 500 characters)..."
+                    className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
+                      formErrors.description
+                        ? 'border-red-500 focus:ring-red-600'
+                        : 'border-gray-300 focus:ring-blue-600'
+                    }`}
                     rows={4}
-                    required
                   />
+                  <div className="flex justify-between items-center mt-2">
+                    <p className="text-xs text-gray-500">{maintenanceForm.description.length}/500 characters</p>
+                    {formErrors.description && (
+                      <p className="text-sm text-red-600">{formErrors.description}</p>
+                    )}
+                  </div>
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-900 mb-2">
                     Priority
+                    <span className="text-red-600 ml-1">*</span>
                   </label>
                   <select
                     value={maintenanceForm.priority}
-                    onChange={(e) =>
-                      setMaintenanceForm({ ...maintenanceForm, priority: e.target.value })
-                    }
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
+                    onChange={(e) => {
+                      setMaintenanceForm({ ...maintenanceForm, priority: e.target.value });
+                      if (formErrors.priority) {
+                        setFormErrors({ ...formErrors, priority: undefined });
+                      }
+                    }}
+                    className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
+                      formErrors.priority
+                        ? 'border-red-500 focus:ring-red-600'
+                        : 'border-gray-300 focus:ring-blue-600'
+                    }`}
                   >
-                    <option value="low">Low</option>
-                    <option value="medium">Medium</option>
-                    <option value="high">High</option>
+                    <option value="">Select priority level</option>
+                    <option value="low">Low - Can wait a few days</option>
+                    <option value="medium">Medium - Should be addressed within a week</option>
+                    <option value="high">High - Needs urgent attention</option>
                   </select>
+                  {formErrors.priority && (
+                    <p className="text-sm text-red-600 mt-1">{formErrors.priority}</p>
+                  )}
                 </div>
 
                 <button
