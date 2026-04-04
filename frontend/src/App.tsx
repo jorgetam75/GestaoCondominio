@@ -7,6 +7,9 @@ import UnauthorizedPage from './pages/Unauthorized';
 import { AdminDashboard } from './pages/AdminDashboard';
 import { ManagerDashboard } from './pages/ManagerDashboard';
 import { ResidentDashboard } from './pages/ResidentDashboard';
+import { AnalyticsDashboard } from './pages/AnalyticsDashboard';
+import { UserManagement } from './pages/UserManagement';
+import { SystemSettings } from './pages/SystemSettings';
 import ProtectedRoute from './components/ProtectedRoute';
 import { UserRole } from '../../shared/types/index.js';
 
@@ -89,6 +92,34 @@ function App() {
         element={
           <ProtectedRoute requiredRoles={[UserRole.RESIDENT]}>
             <ResidentDashboard />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Admin Pages - Phase 5 */}
+      <Route
+        path="/analytics"
+        element={
+          <ProtectedRoute requiredRoles={[UserRole.ADMIN, UserRole.MANAGER]}>
+            <AnalyticsDashboard />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/users"
+        element={
+          <ProtectedRoute requiredRoles={[UserRole.ADMIN]}>
+            <UserManagement />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/settings"
+        element={
+          <ProtectedRoute requiredRoles={[UserRole.ADMIN]}>
+            <SystemSettings />
           </ProtectedRoute>
         }
       />

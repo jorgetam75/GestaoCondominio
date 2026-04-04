@@ -2,7 +2,7 @@
  * Integration tests for Admin Dashboard
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 
 describe('Admin Dashboard - Search & Filter', () => {
   let buildings: any[];
@@ -154,7 +154,8 @@ describe('API Data Fetching - Error Handling', () => {
   });
 
   it('should handle empty responses', () => {
-    const buildings = undefined || [];
+    const getBuildings = () => undefined;
+    const buildings = getBuildings() || [];
     expect(Array.isArray(buildings)).toBe(true);
     expect(buildings).toHaveLength(0);
   });
