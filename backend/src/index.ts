@@ -5,6 +5,14 @@ import 'express-async-errors';
 import { config } from './config/index.js';
 import { initializeDatabase } from './database/connection.js';
 import authRoutes from './routes/auth.js';
+import buildingsRoutes from './routes/buildings.js';
+import unitsRoutes from './routes/units.js';
+import residentsRoutes from './routes/residents.js';
+import financialRoutes from './routes/financial.js';
+import maintenanceRoutes from './routes/maintenance.js';
+import announcementsRoutes from './routes/announcements.js';
+import complaintsRoutes from './routes/complaints.js';
+import accessCodesRoutes from './routes/access-codes.js';
 
 const app: Express = express();
 
@@ -21,17 +29,14 @@ app.get('/health', (_req: Request, res: Response) => {
 
 // API Routes
 app.use('/api/auth', authRoutes);
-
-// TODO: Add routes for:
-// - /api/buildings
-// - /api/units
-// - /api/residents
-// - /api/managers
-// - /api/financial
-// - /api/maintenance
-// - /api/announcements
-// - /api/complaints
-// - /api/access-codes
+app.use('/api/buildings', buildingsRoutes);
+app.use('/api/units', unitsRoutes);
+app.use('/api/residents', residentsRoutes);
+app.use('/api/financial', financialRoutes);
+app.use('/api/maintenance', maintenanceRoutes);
+app.use('/api/announcements', announcementsRoutes);
+app.use('/api/complaints', complaintsRoutes);
+app.use('/api/access-codes', accessCodesRoutes);
 
 // 404 handler
 app.use((_req: Request, res: Response) => {
