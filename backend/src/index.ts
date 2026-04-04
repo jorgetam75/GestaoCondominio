@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import 'express-async-errors';
 import { config } from './config/index.js';
 import { initializeDatabase } from './database/connection.js';
+import authRoutes from './routes/auth.js';
 
 const app: Express = express();
 
@@ -18,13 +19,10 @@ app.get('/health', (_req: Request, res: Response) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-// API Routes placeholder
-app.get('/api/health', (_req: Request, res: Response) => {
-  res.json({ status: 'Backend is running', environment: config.NODE_ENV });
-});
+// API Routes
+app.use('/api/auth', authRoutes);
 
 // TODO: Add routes for:
-// - /api/auth (login, logout, refresh)
 // - /api/buildings
 // - /api/units
 // - /api/residents
