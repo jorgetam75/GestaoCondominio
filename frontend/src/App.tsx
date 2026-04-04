@@ -4,7 +4,29 @@ import useAuthStore from './hooks/useAuth';
 import LoginPage from './pages/Login';
 import DashboardPage from './pages/Dashboard';
 import UnauthorizedPage from './pages/Unauthorized';
+import { AdminDashboard } from './pages/AdminDashboard';
+import { ManagerDashboard } from './pages/ManagerDashboard';
+import { ResidentDashboard } from './pages/ResidentDashboard';
 import ProtectedRoute from './components/ProtectedRoute';
+import { UserRole } from '../../shared/types/index.js';
+
+function RoleDashboard() {
+  const user = useAuthStore((state) => state.user);
+
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  // Route to appropriate dashboard based on role
+  const roleMap: Record<string, () => JSX.Element> = {
+    [UserRole.ADMIN]: AdminDashboard,
+    [UserRole.MANAGER]: ManagerDashboard,
+    [UserRole.RESIDENT]: ResidentDashboard,
+  };
+
+  const Dashboard = roleMap[user.role] || DashboardPage;
+  return <Dashboard />;
+}
 
 function App() {
   const { initializeAuth, isLoading } = useAuthStore();
@@ -38,7 +60,35 @@ function App() {
         path="/dashboard"
         element={
           <ProtectedRoute>
-            <DashboardPage />
+            <RoleDashboard />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Role-specific dashboards */}
+      <Route
+        path="/admin"
+        element={
+          <ProtectedRoute requiredRoles={[UserRole.ADMIN]}>
+            <AdminDashboard />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/manager"
+        element={
+          <ProtectedRoute requiredRoles={[UserRole.MANAGER]}>
+            <ManagerDashboard />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/resident"
+        element={
+          <ProtectedRoute requiredRoles={[UserRole.RESIDENT]}>
+            <ResidentDashboard />
           </ProtectedRoute>
         }
       />
