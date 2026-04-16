@@ -6,6 +6,7 @@ import {
   getCurrentUser,
 } from '../controllers/auth.js';
 import { authMiddleware } from '../middleware/auth.js';
+import { authLoginLimiter, authPublicLimiter } from '../middleware/rateLimit.js';
 
 const router = Router();
 
@@ -15,7 +16,7 @@ const router = Router();
  * Body: { email: string, password: string }
  * Returns: { access_token, refresh_token, user }
  */
-router.post('/login', login);
+router.post('/login', authLoginLimiter, login);
 
 /**
  * POST /api/auth/verify
@@ -23,7 +24,7 @@ router.post('/login', login);
  * Body: { token: string } or Authorization header
  * Returns: { valid: true, user }
  */
-router.post('/verify', verifyTokenEndpoint);
+router.post('/verify', authPublicLimiter, verifyTokenEndpoint);
 
 /**
  * POST /api/auth/logout

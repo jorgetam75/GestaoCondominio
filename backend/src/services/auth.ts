@@ -1,4 +1,4 @@
-import jwt from 'jsonwebtoken';
+import jwt, { SignOptions } from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import { config } from '../config/index.js';
 
@@ -33,15 +33,18 @@ export async function verifyPassword(
  * Generate JWT tokens (access + refresh)
  */
 export function generateTokens(payload: Omit<JWTPayload, 'iat' | 'exp'>) {
-  const accessToken = jwt.sign(payload as any, config.JWT_SECRET, {
-    expiresIn: config.JWT_EXPIRATION,
+  const subject = { sub: payload.sub, email: payload.email, role: payload.role };
+  const accessOpts: SignOptions = {
+    expiresIn: config.JWT_EXPIRATION as SignOptions['expiresIn'],
     algorithm: 'HS256',
-  } as any);
+  };
+  const refreshOpts: SignOptions = {
+    expiresIn: '30d' as SignOptions['expiresIn'],
+    algorithm: 'HS256',
+  };
 
-  const refreshToken = jwt.sign(payload as any, config.JWT_SECRET, {
-    expiresIn: '30d',
-    algorithm: 'HS256',
-  } as any);
+  const accessToken = jwt.sign(subject, config.JWT_SECRET, accessOpts);
+  const refreshToken = jwt.sign(subject, config.JWT_SECRET, refreshOpts);
 
   return { accessToken, refreshToken };
 }

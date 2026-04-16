@@ -16,12 +16,23 @@ import accessCodesRoutes from './routes/access-codes.js';
 
 const app: Express = express();
 
+if (config.TRUST_PROXY) {
+  app.set('trust proxy', 1);
+}
+
 // Middleware
-app.use(helmet());
-app.use(cors({
-  origin: config.CORS_ORIGIN,
-  credentials: true,
-}));
+app.use(
+  helmet({
+    contentSecurityPolicy: false,
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
+  })
+);
+app.use(
+  cors({
+    origin: config.CORS_ORIGIN,
+    credentials: true,
+  })
+);
 app.use(express.json({ limit: '10kb' }));
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 
@@ -47,10 +58,24 @@ app.use((_req: Request, res: Response) => {
 });
 
 // Global error handler
-app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+app.use((err: unknown, _req: Request, res: Response, _next: NextFunction) => {
   console.error(err);
-  res.status(err.status || 500).json({
-    error: err.message || 'Internal server error',
+  const status =
+    err && typeof err === 'object' && 'status' in err && typeof (err as { status: unknown }).status === 'number'
+      ? (err as { status: number }).status
+      : 500;
+  const message =
+    err && typeof err === 'object' && 'message' in err && typeof (err as { message: unknown }).message === 'string'
+      ? (err as { message: string }).message
+      : 'Internal server error';
+
+  if (config.isProduction && status >= 500) {
+    res.status(status).json({ error: 'Internal server error' });
+    return;
+  }
+
+  res.status(status).json({
+    error: message || 'Internal server error',
   });
 });
 
@@ -64,7 +89,7 @@ async function start() {
     await initializeDatabase();
     console.log('✓ Database connected');
 
-    const PORT = config.PORT || 3001;
+    const PORT = config.PORT;
     app.listen(PORT, () => {
       console.log(`\n🚀 Server started on http://localhost:${PORT}`);
       console.log(`📚 API documentation: http://localhost:${PORT}/api/docs (TODO)`);
