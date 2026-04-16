@@ -26,14 +26,19 @@ export async function getBuilding(id: string) {
 
 export async function listBuildings(limit = 50, offset = 0) {
   const result = await query(
-    `SELECT * FROM buildings ORDER BY created_at DESC LIMIT $1 OFFSET $2`,
+    `SELECT *, COUNT(*) OVER() AS __total
+     FROM buildings
+     ORDER BY created_at DESC
+     LIMIT $1 OFFSET $2`,
     [limit, offset]
   );
-  const countResult = await query(`SELECT COUNT(*) FROM buildings`);
-  return {
-    buildings: result.rows,
-    total: parseInt(countResult.rows[0].count),
-  };
+  const total =
+    result.rows.length > 0 ? parseInt(String(result.rows[0].__total), 10) : 0;
+  const buildings = result.rows.map((row: Record<string, unknown>) => {
+    const { __total, ...rest } = row;
+    return rest;
+  });
+  return { buildings, total };
 }
 
 const ALLOWED_BUILDING_FIELDS = ['name', 'address', 'city', 'state', 'zip_code'];
@@ -74,24 +79,22 @@ export async function deleteBuilding(id: string) {
 }
 
 export async function getBuildingWithStats(id: string) {
-  const building = await getBuilding(id);
-  if (!building) return null;
-
-  const unitsResult = await query(
-    `SELECT COUNT(*) FROM units WHERE building_id = $1`,
+  const result = await query(
+    `SELECT b.*,
+ (SELECT COUNT(*)::text FROM units u WHERE u.building_id = b.id) AS unit_count,
+       (SELECT COUNT(DISTINCT r.id)::text FROM residents r
+        JOIN units u ON r.unit_id = u.id
+        WHERE u.building_id = b.id) AS resident_count
+     FROM buildings b
+     WHERE b.id = $1`,
     [id]
   );
-
-  const residentsResult = await query(
-    `SELECT COUNT(DISTINCT r.id) FROM residents r
-     JOIN units u ON r.unit_id = u.id
-     WHERE u.building_id = $1`,
-    [id]
-  );
+  const row = result.rows[0];
+  if (!row) return null;
 
   return {
-    ...building,
-    unit_count: parseInt(unitsResult.rows[0].count),
-    resident_count: parseInt(residentsResult.rows[0].count),
+    ...row,
+    unit_count: parseInt(String(row.unit_count), 10),
+    resident_count: parseInt(String(row.resident_count), 10),
   };
 }

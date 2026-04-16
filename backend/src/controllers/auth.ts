@@ -1,31 +1,29 @@
 import { Request, Response } from 'express';
 import { query } from '../database/connection.js';
+import { config } from '../config/index.js';
 import {
   verifyPassword,
   generateTokens,
   verifyToken,
 } from '../services/auth.js';
-
-type LoginRequest = {
-  email: string;
-  password: string;
-};
+import { loginBodySchema, verifyBodySchema } from '../validation/auth.js';
 
 /**
  * Login endpoint - returns JWT access token
  */
-export async function login(req: Request<{}, {}, LoginRequest>, res: Response): Promise<void> {
+export async function login(req: Request, res: Response): Promise<void> {
   try {
-    const { email, password } = req.body;
-
-    // Validate input
-    if (!email || !password) {
+    const parsed = loginBodySchema.safeParse(req.body);
+    if (!parsed.success) {
       res.status(400).json({
         success: false,
-        error: 'Email and password are required',
+        error: config.isProduction ? 'Invalid request' : 'Validation failed',
+        ...(config.isProduction ? {} : { details: parsed.error.flatten() }),
       });
       return;
     }
+    const email = parsed.data.email.trim().toLowerCase();
+    const { password } = parsed.data;
 
     // Find user by email
     const result = await query(
@@ -105,9 +103,18 @@ export async function login(req: Request<{}, {}, LoginRequest>, res: Response): 
  */
 export async function verifyTokenEndpoint(req: Request, res: Response): Promise<void> {
   try {
+    const bodyParsed = verifyBodySchema.safeParse(req.body ?? {});
+    if (!bodyParsed.success) {
+      res.status(400).json({
+        success: false,
+        error: config.isProduction ? 'Invalid request' : 'Validation failed',
+        ...(config.isProduction ? {} : { details: bodyParsed.error.flatten() }),
+      });
+      return;
+    }
+
     const token =
-      req.headers.authorization?.split(' ')[1] ||
-      req.body.token;
+      req.headers.authorization?.split(' ')[1] || bodyParsed.data.token;
 
     if (!token) {
       res.status(400).json({

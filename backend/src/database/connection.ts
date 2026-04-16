@@ -48,11 +48,5 @@ export async function closeDatabase() {
 
 // Export query helper
 export async function query(text: string, params?: any[]) {
-  const client = await getPool().connect();
-  try {
-    const result = await client.query(text, params);
-    return result;
-  } finally {
-    client.release();
-  }
+  return getPool().query(text, params);
 }
